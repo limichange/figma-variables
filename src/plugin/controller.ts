@@ -1,33 +1,44 @@
 import colorConverter from 'color-convert';
 
+function formatName(name: string) {
+  const newName = name
+    .toLocaleLowerCase()
+    .replace(/\,/g, '')
+    .replace(/(\․|\ \()|(\)\ )|(\)\/)|\(|\)| |\//g, '-');
+
+  // remove last -
+  if (newName.endsWith('-')) {
+    return newName.slice(0, -1);
+  } else {
+    return newName;
+  }
+}
+
 figma.showUI(__html__);
 
 figma.ui.onmessage = () => {
   const localVariableCollections = figma.variables.getLocalVariableCollections();
-  const values: Record<string, Record<string, string | number>> = {};
+  const values: Record<string, Record<string, string | number | Record<string, string | number>>> = {};
 
   for (const localVariableCollection of localVariableCollections) {
-    const { modes, name: localVariableCollectionName, variableIds, defaultModeId } = localVariableCollection;
+    const { modes, name: localVariableCollectionName, variableIds } = localVariableCollection;
 
-    console.log(localVariableCollectionName, modes);
+    values[localVariableCollectionName] = {};
 
-    if (
-      localVariableCollectionName === '_Primitives' ||
-      localVariableCollectionName === '1. Color modes' ||
-      localVariableCollectionName === '2. Radius' ||
-      localVariableCollectionName === '3. Spacing' ||
-      localVariableCollectionName === '4. Widths' ||
-      localVariableCollectionName === '5. Containers'
-    ) {
-      values[localVariableCollectionName] = {};
+    for (const mode of modes) {
+      const currentModeId = mode.modeId;
+      const currentModeName = formatName(mode.name);
+
+      values[localVariableCollectionName][currentModeName] = {};
 
       variableIds.forEach((variableId) => {
         const variable = figma.variables.getVariableById(variableId);
+        const variableName = formatName(variable.name);
 
         // console.log(variable);
 
         if (variable.resolvedType === 'COLOR') {
-          const color = variable.valuesByMode[defaultModeId];
+          const color = variable.valuesByMode[currentModeId];
           let colorValue = '';
 
           if (typeof color === 'object' && color['a'] === 0) {
@@ -43,25 +54,27 @@ figma.ui.onmessage = () => {
             const colorAlias = color as VariableAlias;
             const variableAlias = figma.variables.getVariableById(colorAlias.id);
 
-            colorValue = variableAlias.name.toLocaleLowerCase().replace(/(\ \()|(\)\ )|(\)\/)|\(|\)| |\//g, '-');
+            colorValue = formatName(variableAlias.name);
+
+            if (colorValue === 'colors-foreground-fg-brand-primary-600-') {
+              console.log(variable, variableAlias);
+            }
           } else {
-            console.log('!!!size', color);
+            console.log('!!!color', color);
           }
 
-          const keyName = variable.name.toLocaleLowerCase().replace(/(\ \()|(\)\ )|(\)\/)|\(|\)| |\//g, '-');
-
-          values[localVariableCollectionName][keyName] = colorValue;
+          values[localVariableCollectionName][currentModeName][variableName] = colorValue;
         } else if (variable.resolvedType === 'FLOAT') {
-          const size = variable.valuesByMode[defaultModeId] as number | VariableAlias;
+          const size = variable.valuesByMode[currentModeId] as number | VariableAlias;
 
           if (typeof size === 'number') {
-            values[localVariableCollectionName][variable.name] = size;
+            values[localVariableCollectionName][currentModeName][variableName] = size;
           } else if (size.type === 'VARIABLE_ALIAS') {
             size as VariableAlias;
 
-            const variable = figma.variables.getVariableById(size.id);
+            const sizeVariable = figma.variables.getVariableById(size.id);
 
-            values[localVariableCollectionName][variable.name] = variable.name;
+            values[localVariableCollectionName][currentModeName][variableName] = formatName(sizeVariable.name);
           } else {
             console.log('!!!size', size);
           }
