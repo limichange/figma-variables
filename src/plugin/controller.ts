@@ -14,7 +14,10 @@ function formatName(name: string) {
   }
 }
 
-figma.showUI(__html__);
+figma.showUI(__html__, {
+  width: 860,
+  height: 600,
+});
 
 figma.ui.onmessage = () => {
   const localVariableCollections = figma.variables.getLocalVariableCollections();
@@ -30,6 +33,7 @@ figma.ui.onmessage = () => {
       const currentModeName = formatName(mode.name);
 
       values[localVariableCollectionName][currentModeName] = {};
+      const currentMode = values[localVariableCollectionName][currentModeName];
 
       variableIds.forEach((variableId) => {
         const variable = figma.variables.getVariableById(variableId);
@@ -43,38 +47,35 @@ figma.ui.onmessage = () => {
 
           if (typeof color === 'object' && color['a'] === 0) {
             colorValue = 'transparent';
+            currentMode[variableName] = colorValue;
           } else if (color['a'] === 1) {
             const colorRGB = color as RGB;
 
             colorValue = '#' + colorConverter.rgb.hex(colorRGB.r * 100, colorRGB.g * 100, colorRGB.b * 100);
+            currentMode[variableName] = colorValue;
           } else if (color['a'] !== 1 && typeof color['a'] === 'number') {
             const colorRGBA = color as RGBA;
             colorValue = `rgba(${colorRGBA.r}, ${colorRGBA.g}, ${colorRGBA.b}, ${colorRGBA.a.toFixed(2)})`;
+            currentMode[variableName] = colorValue;
           } else if (color['type'] === 'VARIABLE_ALIAS') {
             const colorAlias = color as VariableAlias;
             const variableAlias = figma.variables.getVariableById(colorAlias.id);
 
-            colorValue = formatName(variableAlias.name);
-
-            if (colorValue === 'colors-foreground-fg-brand-primary-600-') {
-              console.log(variable, variableAlias);
-            }
+            currentMode[variableName] = `var(--${formatName(variableAlias.name)})`;
           } else {
             console.log('!!!color', color);
           }
-
-          values[localVariableCollectionName][currentModeName][variableName] = colorValue;
         } else if (variable.resolvedType === 'FLOAT') {
           const size = variable.valuesByMode[currentModeId] as number | VariableAlias;
 
           if (typeof size === 'number') {
-            values[localVariableCollectionName][currentModeName][variableName] = size;
+            currentMode[variableName] = size;
           } else if (size.type === 'VARIABLE_ALIAS') {
             size as VariableAlias;
 
             const sizeVariable = figma.variables.getVariableById(size.id);
 
-            values[localVariableCollectionName][currentModeName][variableName] = formatName(sizeVariable.name);
+            currentMode[variableName] = `var(--${formatName(sizeVariable.name)})`;
           } else {
             console.log('!!!size', size);
           }
@@ -86,6 +87,13 @@ figma.ui.onmessage = () => {
   }
 
   console.log(values);
+
+  figma.ui.postMessage({
+    type: 'return-local-variables',
+    message: values,
+  });
+
+  // figma copy values
 
   // figma.variables.getLocalVariablesAsync().then((variables) => {
   //   console.log(variables);

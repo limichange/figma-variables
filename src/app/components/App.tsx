@@ -2,36 +2,35 @@ import React from 'react';
 import '../styles/ui.css';
 
 function App() {
-  const textbox = React.useRef<HTMLInputElement>(undefined);
-
-  const countRef = React.useCallback((element: HTMLInputElement) => {
-    if (element) element.value = '5';
-    textbox.current = element;
-  }, []);
-
+  const [data, setData] = React.useState<any>({});
   const onCreate = () => {
-    const count = parseInt(textbox.current.value, 10);
-    parent.postMessage({ pluginMessage: { type: 'create-rectangles', count } }, '*');
+    parent.postMessage({ pluginMessage: { type: 'create-rectangles', count: 0 } }, '*');
   };
 
   React.useEffect(() => {
     // This is how we read messages sent from the plugin controller
     window.onmessage = (event) => {
       const { type, message } = event.data.pluginMessage;
-      if (type === 'create-rectangles') {
-        console.log(`Figma Says: ${message}`);
+
+      if (type === 'return-local-variables') {
+        setData(message);
       }
     };
   }, []);
 
   return (
-    <div>
-      <p>
-        Count: <input ref={countRef} />
-      </p>
+    <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', gap: 12 }}>
       <button id="create" onClick={onCreate}>
         Create
       </button>
+
+      <textarea
+        style={{
+          flex: 1,
+        }}
+        id="data"
+        value={JSON.stringify(data, null, 2)}
+      />
     </div>
   );
 }
