@@ -15,10 +15,6 @@ function App() {
     parent.postMessage({ pluginMessage: { type: 'create-rectangles', count } }, '*');
   };
 
-  const onCancel = () => {
-    parent.postMessage({ pluginMessage: { type: 'cancel' } }, '*');
-  };
-
   React.useEffect(() => {
     // This is how we read messages sent from the plugin controller
     window.onmessage = (event) => {
@@ -39,7 +35,6 @@ function App() {
       <button id="create" onClick={onCreate}>
         Create
       </button>
-      <button onClick={onCancel}>Cancel</button>
     </div>
   );
 }
