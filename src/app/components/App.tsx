@@ -1,5 +1,4 @@
 import React from 'react';
-import logo from '../assets/logo.svg';
 import '../styles/ui.css';
 
 function App() {
@@ -27,8 +26,6 @@ function App() {
 
   return (
     <div>
-      <img src={logo} />
-      <h2>Rectangle Creator</h2>
       <p>
         Count: <input ref={countRef} />
       </p>
