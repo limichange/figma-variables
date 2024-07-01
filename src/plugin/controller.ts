@@ -51,7 +51,9 @@ figma.ui.onmessage = () => {
           } else if (color['a'] === 1) {
             const colorRGB = color as RGB;
 
-            colorValue = '#' + colorConverter.rgb.hex(colorRGB.r * 100, colorRGB.g * 100, colorRGB.b * 100);
+            console.log(colorRGB);
+
+            colorValue = '#' + colorConverter.rgb.hex(colorRGB.r * 255, colorRGB.g * 255, colorRGB.b * 255);
             currentMode[variableName] = colorValue;
           } else if (color['a'] !== 1 && typeof color['a'] === 'number') {
             const colorRGBA = color as RGBA;
