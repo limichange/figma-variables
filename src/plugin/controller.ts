@@ -14,6 +14,16 @@ function formatName(name: string) {
   }
 }
 
+function getLastName(name: string) {
+  const onlyAliasLastNames = name.split('/');
+
+  if (onlyAliasLastNames.length > 1) {
+    return onlyAliasLastNames[onlyAliasLastNames.length - 1];
+  } else {
+    return name;
+  }
+}
+
 figma.showUI(__html__, {
   width: 860,
   height: 600,
@@ -37,9 +47,7 @@ figma.ui.onmessage = () => {
 
       variableIds.forEach((variableId) => {
         const variable = figma.variables.getVariableById(variableId);
-        const variableName = formatName(variable.name);
-
-        // console.log(variable);
+        const variableName = formatName(getLastName(variable.name));
 
         if (variable.resolvedType === 'COLOR') {
           const color = variable.valuesByMode[currentModeId];
@@ -50,8 +58,6 @@ figma.ui.onmessage = () => {
             currentMode[variableName] = colorValue;
           } else if (color['a'] === 1) {
             const colorRGB = color as RGB;
-
-            console.log(colorRGB);
 
             colorValue = '#' + colorConverter.rgb.hex(colorRGB.r * 255, colorRGB.g * 255, colorRGB.b * 255);
             currentMode[variableName] = colorValue;
@@ -77,7 +83,7 @@ figma.ui.onmessage = () => {
 
             const sizeVariable = figma.variables.getVariableById(size.id);
 
-            currentMode[variableName] = `var(--${formatName(sizeVariable.name)})`;
+            currentMode[variableName] = `var(--${formatName(getLastName(sizeVariable.name))})`;
           } else {
             console.log('!!!size', size);
           }
