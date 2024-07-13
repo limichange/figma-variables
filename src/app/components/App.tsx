@@ -20,6 +20,15 @@ function App() {
 
   return (
     <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <button
+        id="clear"
+        onClick={() => {
+          parent.postMessage({ pluginMessage: { type: 'get-tailwind-classes', count: 0 } }, '*');
+        }}
+      >
+        Get current frame tailwind classes
+      </button>
+
       <button id="create" onClick={onCreate}>
         Create
       </button>

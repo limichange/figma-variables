@@ -1,35 +1,34 @@
 import colorConverter from 'color-convert';
-
-function formatName(name: string) {
-  const newName = name
-    .toLocaleLowerCase()
-    .replace(/\,/g, '')
-    .replace(/(\․|\ \()|(\)\ )|(\)\/)|\(|\)| |\//g, '-');
-
-  // remove last -
-  if (newName.endsWith('-')) {
-    return newName.slice(0, -1);
-  } else {
-    return newName;
-  }
-}
-
-function getLastName(name: string) {
-  const onlyAliasLastNames = name.split('/');
-
-  if (onlyAliasLastNames.length > 1) {
-    return onlyAliasLastNames[onlyAliasLastNames.length - 1];
-  } else {
-    return name;
-  }
-}
+import getTailwindClasses from './getTailwindClasses';
+import { getLastName } from './utils/getLastName';
+import { formatName } from './utils/formatName';
 
 figma.showUI(__html__, {
   width: 860,
   height: 600,
 });
 
-figma.ui.onmessage = () => {
+figma.ui.onmessage = (message) => {
+  if (message.type === 'get-tailwind-classes') {
+    let currentNode: SceneNode | null = null;
+
+    for (const node of figma.currentPage.selection) {
+      currentNode = node;
+      break;
+    }
+
+    if (currentNode) {
+      const tailwindClasses = getTailwindClasses(currentNode);
+
+      figma.ui.postMessage({
+        type: 'return-tailwind-classes',
+        message: tailwindClasses,
+      });
+    }
+
+    return;
+  }
+
   const localVariableCollections = figma.variables.getLocalVariableCollections();
   const values: Record<string, Record<string, string | number | Record<string, string | number>>> = {};
 
