@@ -4,11 +4,13 @@ import { getLastName } from './utils/getLastName';
 import { formatName } from './utils/formatName';
 
 figma.showUI(__html__, {
-  width: 860,
-  height: 600,
+  width: 460,
+  height: 300,
 });
 
 figma.ui.onmessage = (message) => {
+  console.clear();
+
   if (message.type === 'get-tailwind-classes') {
     let currentNode: SceneNode | null = null;
 
@@ -20,9 +22,15 @@ figma.ui.onmessage = (message) => {
     if (currentNode) {
       const tailwindClasses = getTailwindClasses(currentNode);
 
+      let code = `<div classnames="${tailwindClasses.join(' ')}"></div>`;
+
+      if (currentNode.type === 'TEXT') {
+        code = `<div classnames="${tailwindClasses.join(' ')}">${currentNode.characters}</div>`;
+      }
+
       figma.ui.postMessage({
         type: 'return-tailwind-classes',
-        message: tailwindClasses,
+        message: code,
       });
     }
 

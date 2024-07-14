@@ -13,6 +13,8 @@ function App() {
       const { type, message } = event.data.pluginMessage;
 
       if (type === 'return-local-variables') {
+        setData(JSON.stringify(message, null, 2));
+      } else if (type === 'return-tailwind-classes') {
         setData(message);
       }
     };
@@ -38,7 +40,7 @@ function App() {
           flex: 1,
         }}
         id="data"
-        value={JSON.stringify(data, null, 2)}
+        value={data}
       />
     </div>
   );
