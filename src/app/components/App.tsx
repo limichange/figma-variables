@@ -32,7 +32,7 @@ function App() {
       </button>
 
       <button id="create" onClick={onCreate}>
-        Create
+        Get all variables
       </button>
 
       <textarea

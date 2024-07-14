@@ -35,11 +35,15 @@ export default function getTailwindClasses(node: SceneNode) {
 
       const name = textStyle.name;
       const names = name.split('/');
-      const fontSize = names[0].replace(' ', '-').toLowerCase();
-      const fontWeight = `text-${names[1].toLowerCase()}`;
 
+      const fontSize = names[0].replace(' ', '-').toLowerCase();
       tailwindClasses.push(fontSize);
-      tailwindClasses.push(fontWeight);
+
+      const fontWeight = names[1].toLowerCase();
+      const fontWeightClass = `text-${fontWeight}`;
+      if (fontWeight !== 'regular') {
+        tailwindClasses.push(fontWeightClass);
+      }
     }
 
     if (textNode.opacity < 1) {
@@ -87,9 +91,9 @@ export default function getTailwindClasses(node: SceneNode) {
     if (frameNode.layoutMode === 'HORIZONTAL') {
       tailwindClasses.push('flex items-center');
 
-      if (frameNode.layoutPositioning === 'AUTO') {
-        tailwindClasses.push('justify-center');
-      }
+      // if (frameNode.layoutPositioning === 'AUTO') {
+      //   tailwindClasses.push('justify-center');
+      // }
     } else if (frameNode.layoutMode === 'VERTICAL') {
       tailwindClasses.push('flex flex-col items-center');
     }
@@ -100,6 +104,23 @@ export default function getTailwindClasses(node: SceneNode) {
 
     if (frameNode.opacity < 1) {
       tailwindClasses.push(`opacity-${frameNode.opacity.toFixed(2)}`);
+    }
+
+    // strokes
+    const { strokeWeight, strokes } = frameNode;
+
+    if (strokeWeight && typeof strokeWeight === 'number' && strokeWeight > 0 && strokes && strokes.length > 0) {
+      if (strokeWeight === 1) {
+        tailwindClasses.push('border');
+      } else {
+        tailwindClasses.push(`border-${strokeWeight}`);
+      }
+
+      const strokeColor = strokes[0] as any;
+      const id = strokeColor.boundVariables.color.id;
+      const variable = figma.variables.getVariableById(id);
+      const strokeColorClass = `border-${formatName(getLastName(variable.name))}`;
+      tailwindClasses.push(strokeColorClass);
     }
   }
 
