@@ -88,14 +88,42 @@ export default function getTailwindClasses(node: SceneNode) {
       tailwindClasses.push(`rounded-${borderRadiusMap.get(cornerRadius)}`);
     }
 
-    if (frameNode.layoutMode === 'HORIZONTAL') {
-      tailwindClasses.push('flex items-center');
+    if (frameNode.layoutMode !== 'NONE') {
+      const { counterAxisAlignItems, primaryAxisAlignItems } = frameNode;
 
-      // if (frameNode.layoutPositioning === 'AUTO') {
-      //   tailwindClasses.push('justify-center');
-      // }
-    } else if (frameNode.layoutMode === 'VERTICAL') {
-      tailwindClasses.push('flex flex-col items-center');
+      if (frameNode.layoutMode === 'HORIZONTAL') {
+        tailwindClasses.push('flex');
+
+        if (counterAxisAlignItems === 'CENTER') {
+          tailwindClasses.push('items-center');
+        } else if (counterAxisAlignItems === 'MAX') {
+          tailwindClasses.push('items-end');
+        }
+
+        if (primaryAxisAlignItems === 'CENTER') {
+          tailwindClasses.push('justify-center');
+        } else if (primaryAxisAlignItems === 'MAX') {
+          tailwindClasses.push('justify-end');
+        } else if (primaryAxisAlignItems === 'SPACE_BETWEEN') {
+          tailwindClasses.push('justify-between');
+        }
+      } else if (frameNode.layoutMode === 'VERTICAL') {
+        tailwindClasses.push('flex flex-col');
+
+        if (counterAxisAlignItems === 'CENTER') {
+          tailwindClasses.push('items-center');
+        } else if (counterAxisAlignItems === 'MAX') {
+          tailwindClasses.push('items-end');
+        }
+
+        if (primaryAxisAlignItems === 'CENTER') {
+          tailwindClasses.push('justify-center');
+        } else if (primaryAxisAlignItems === 'MAX') {
+          tailwindClasses.push('justify-end');
+        } else if (primaryAxisAlignItems === 'SPACE_BETWEEN') {
+          tailwindClasses.push('justify-between');
+        }
+      }
     }
 
     if (frameNode.itemSpacing) {
