@@ -37,10 +37,14 @@ export default function getTailwindClasses(node: SceneNode) {
       const names = name.split('/');
 
       const fontSize = names[0].replace(' ', '-').toLowerCase();
-      tailwindClasses.push(fontSize);
+      if (fontSize.startsWith('display-')) {
+        tailwindClasses.push(`text-${fontSize}`);
+      } else {
+        tailwindClasses.push(fontSize);
+      }
 
       const fontWeight = names[1].toLowerCase();
-      const fontWeightClass = `text-${fontWeight}`;
+      const fontWeightClass = `font-${fontWeight}`;
       if (fontWeight !== 'regular') {
         tailwindClasses.push(fontWeightClass);
       }
@@ -49,7 +53,13 @@ export default function getTailwindClasses(node: SceneNode) {
     if (textNode.opacity < 1) {
       tailwindClasses.push(`opacity-${textNode.opacity.toFixed(2)}`);
     }
-  } else if (node.type === 'FRAME' || node.type === 'GROUP' || node.type === 'INSTANCE') {
+  } else if (
+    node.type === 'FRAME' ||
+    node.type === 'GROUP' ||
+    node.type === 'INSTANCE' ||
+    node.type === 'LINE' ||
+    node.type === 'COMPONENT'
+  ) {
     const frameNode = node as FrameNode;
 
     try {
@@ -69,17 +79,30 @@ export default function getTailwindClasses(node: SceneNode) {
     // paddingTop : 16
     const { paddingBottom, paddingLeft, paddingRight, paddingTop } = frameNode;
 
-    if (paddingBottom) {
-      tailwindClasses.push(`pb-${paddingBottom}`);
-    }
-    if (paddingLeft) {
-      tailwindClasses.push(`pl-${paddingLeft}`);
-    }
-    if (paddingRight) {
-      tailwindClasses.push(`pr-${paddingRight}`);
-    }
-    if (paddingTop) {
-      tailwindClasses.push(`pt-${paddingTop}`);
+    if (paddingTop === paddingBottom && paddingLeft === paddingRight) {
+      tailwindClasses.push(`p-${paddingTop}`);
+    } else {
+      if (paddingTop === paddingBottom) {
+        tailwindClasses.push(`py-${paddingTop}`);
+      } else {
+        if (paddingBottom) {
+          tailwindClasses.push(`pb-${paddingBottom}`);
+        }
+        if (paddingTop) {
+          tailwindClasses.push(`pt-${paddingTop}`);
+        }
+      }
+
+      if (paddingLeft === paddingRight) {
+        tailwindClasses.push(`px-${paddingLeft}`);
+      } else {
+        if (paddingLeft) {
+          tailwindClasses.push(`pl-${paddingLeft}`);
+        }
+        if (paddingRight) {
+          tailwindClasses.push(`pr-${paddingRight}`);
+        }
+      }
     }
 
     const { cornerRadius } = frameNode;

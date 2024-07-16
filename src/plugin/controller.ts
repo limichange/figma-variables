@@ -22,10 +22,10 @@ figma.ui.onmessage = (message) => {
     if (currentNode) {
       const tailwindClasses = getTailwindClasses(currentNode);
 
-      let code = `<div classnames="${tailwindClasses.join(' ')}"></div>`;
+      let code = `<div className="${tailwindClasses.join(' ')}"></div>`;
 
       if (currentNode.type === 'TEXT') {
-        code = `<div classnames="${tailwindClasses.join(' ')}">${currentNode.characters}</div>`;
+        code = `<div className="${tailwindClasses.join(' ')}">${currentNode.characters}</div>`;
       }
 
       figma.ui.postMessage({

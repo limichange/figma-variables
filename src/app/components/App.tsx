@@ -16,6 +16,14 @@ function App() {
         setData(JSON.stringify(message, null, 2));
       } else if (type === 'return-tailwind-classes') {
         setData(message);
+
+        // copy to clipboard
+        const textarea = document.createElement('textarea');
+        textarea.value = message;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
       }
     };
   }, []);
