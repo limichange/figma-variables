@@ -79,28 +79,34 @@ export default function getTailwindClasses(node: SceneNode) {
     // paddingTop : 16
     const { paddingBottom, paddingLeft, paddingRight, paddingTop } = frameNode;
 
-    if (paddingTop === paddingBottom && paddingLeft === paddingRight) {
-      tailwindClasses.push(`p-${paddingTop}`);
+    function addPadding(value: number, str: string) {
+      if (value && typeof value === 'number' && value > 0) {
+        tailwindClasses.push(str);
+      }
+    }
+
+    if (paddingTop === paddingBottom && paddingLeft === paddingRight && paddingTop === paddingRight) {
+      addPadding(paddingTop, `p-${paddingTop}`);
     } else {
       if (paddingTop === paddingBottom) {
-        tailwindClasses.push(`py-${paddingTop}`);
+        addPadding(paddingTop, `py-${paddingTop}`);
       } else {
         if (paddingBottom) {
-          tailwindClasses.push(`pb-${paddingBottom}`);
+          addPadding(paddingBottom, `pb-${paddingBottom}`);
         }
         if (paddingTop) {
-          tailwindClasses.push(`pt-${paddingTop}`);
+          addPadding(paddingTop, `pt-${paddingTop}`);
         }
       }
 
       if (paddingLeft === paddingRight) {
-        tailwindClasses.push(`px-${paddingLeft}`);
+        addPadding(paddingLeft, `px-${paddingLeft}`);
       } else {
         if (paddingLeft) {
-          tailwindClasses.push(`pl-${paddingLeft}`);
+          addPadding(paddingLeft, `pl-${paddingLeft}`);
         }
         if (paddingRight) {
-          tailwindClasses.push(`pr-${paddingRight}`);
+          addPadding(paddingRight, `pr-${paddingRight}`);
         }
       }
     }
