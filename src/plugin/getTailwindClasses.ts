@@ -58,7 +58,9 @@ export default function getTailwindClasses(node: SceneNode) {
     node.type === 'GROUP' ||
     node.type === 'INSTANCE' ||
     node.type === 'LINE' ||
-    node.type === 'COMPONENT'
+    node.type === 'COMPONENT' ||
+    node.type === 'RECTANGLE' ||
+    node.type === 'ELLIPSE'
   ) {
     const frameNode = node as FrameNode;
 
